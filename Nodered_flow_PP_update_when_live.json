@@ -1,0 +1,306 @@
+[
+    {
+        "id": "30e3e353.0fd84c",
+        "type": "tab",
+        "label": "Twitter_PP_update_when_live",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "475d9e8e.cf2038",
+        "type": "inject",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "60",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 120,
+        "wires": [
+            [
+                "a9c2284.c5d92d8"
+            ]
+        ]
+    },
+    {
+        "id": "da4acc35.abe928",
+        "type": "function",
+        "z": "30e3e353.0fd84c",
+        "name": "Up_live",
+        "func": "var Twitter = global.get('twitter');\nvar img64 = \"YOUR_BASE_64_PROFILE_PICTURE_WHEN_LIVE\"\nvar client = new Twitter({\n    consumer_key: \"YOUR_TWITTER_API_CONSUMER_KEY\",\n    consumer_secret: \"YOUR_TWITTER_API_CONSUMER_SECRET\",\n    access_token_key: \"YOUR_TWITTER_API_TOKEN_KEY\",\n    access_token_secret: \"YOUR_TWITTER_API_TOKEN_SECRET\"\n});\n\nclient.post('account/update_profile_image', { image: img64 }, function(err) {\n    if(err) {msg.payload = err}\n});\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1020,
+        "y": 80,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4a8c5bf3.85daa4",
+        "type": "http request",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "https://api.twitch.tv/kraken/streams/YOUR_STREAMER_ID",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "authType": "",
+        "x": 410,
+        "y": 120,
+        "wires": [
+            [
+                "58825c4.f5da3a4"
+            ]
+        ]
+    },
+    {
+        "id": "a9c2284.c5d92d8",
+        "type": "function",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "func": "msg.payload = \"data to post\";\nmsg.headers = {};\nmsg.headers['Accept'] = 'application/vnd.twitchtv.v5+json';\nmsg.headers['Client-ID'] = 'YOUR_TWITCH_CLIENT_ID';\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 260,
+        "y": 120,
+        "wires": [
+            [
+                "4a8c5bf3.85daa4"
+            ]
+        ]
+    },
+    {
+        "id": "c712e9a2.5606d",
+        "type": "function",
+        "z": "30e3e353.0fd84c",
+        "name": "Up_not_live",
+        "func": "var Twitter = global.get('twitter');\nvar img64 = \"YOUR_BASE_64_PROFILE_PICTURE_WHEN__NOT_LIVE\"\nvar client = new Twitter({\n    consumer_key: \"YOUR_TWITTER_API_CONSUMER_KEY\",\n    consumer_secret: \"YOUR_TWITTER_API_CONSUMER_SECRET\",\n    access_token_key: \"YOUR_TWITTER_API_TOKEN_KEY\",\n    access_token_secret: \"YOUR_TWITTER_API_TOKEN_SECRET\"\n});\n\nclient.post('account/update_profile_image', { image: img64 }, function(err) {\n    if(err) {msg.payload = err}\n});\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 1030,
+        "y": 240,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fe2574b6.2c5be",
+        "type": "switch",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "property": "payload.stream",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "nnull"
+            },
+            {
+                "t": "null"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 670,
+        "y": 120,
+        "wires": [
+            [
+                "3bec6a1c.f28c16"
+            ],
+            [
+                "d3a5d954.859ef8"
+            ]
+        ]
+    },
+    {
+        "id": "58825c4.f5da3a4",
+        "type": "json",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 550,
+        "y": 120,
+        "wires": [
+            [
+                "fe2574b6.2c5be"
+            ]
+        ]
+    },
+    {
+        "id": "b4577058.caac9",
+        "type": "change",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "status",
+                "pt": "flow",
+                "to": "not live",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1040,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d3a5d954.859ef8",
+        "type": "switch",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "property": "status",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "live",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 850,
+        "y": 240,
+        "wires": [
+            [
+                "c712e9a2.5606d",
+                "b4577058.caac9"
+            ]
+        ]
+    },
+    {
+        "id": "3bec6a1c.f28c16",
+        "type": "switch",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "property": "status",
+        "propertyType": "flow",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "not live",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 850,
+        "y": 80,
+        "wires": [
+            [
+                "da4acc35.abe928",
+                "4f3143cc.553cd4"
+            ]
+        ]
+    },
+    {
+        "id": "4f3143cc.553cd4",
+        "type": "change",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "status",
+                "pt": "flow",
+                "to": "live",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1040,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "671d956e.5b9e34",
+        "type": "change",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "status",
+                "pt": "flow",
+                "to": "not live",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 320,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "24690087.40c24",
+        "type": "inject",
+        "z": "30e3e353.0fd84c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 200,
+        "wires": [
+            [
+                "671d956e.5b9e34"
+            ]
+        ]
+    }
+]
